@@ -1,0 +1,12 @@
+# Node dependencies
+node_modules/
+**/node_modules/
+
+# Build and environment files
+.env
+build/
+dist/
+
+node_modules/
+secureshelf-frontend/node_modules/
+secureshelf-backend/node_modules/
