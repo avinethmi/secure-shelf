@@ -1,7 +1,10 @@
-const express = require('express');
+import express from 'express';
+// Change 'import db from ...' to import { connectDB } with curly braces
+import { connectDB } from '../config/db.js'; 
+
 const router = express.Router();
-// Assuming 'pool' or 'db' is your PostgreSQL connection client
-const db = require('../db'); 
+// Initialize the mock database connection
+const db = connectDB();
 
 // GET /api/cctv/logs - Retrieve all CCTV logs from Database
 router.get('/api/cctv/logs', async (req, res) => {
@@ -35,4 +38,4 @@ router.post('/api/cctv/logs', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

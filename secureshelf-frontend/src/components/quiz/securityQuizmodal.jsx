@@ -41,7 +41,7 @@ export default function SecurityQuizModal({ onQuizPassed }) {
   };
 
   return (
-    <div className="modal-overlay">
+    <div className="section-container">
       <div className="modal-content">
         <h2>Mandatory Security Quiz</h2>
         {error && <p className="error-text">{error}</p>}

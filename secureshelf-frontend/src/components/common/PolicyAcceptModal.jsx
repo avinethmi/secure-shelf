@@ -18,8 +18,8 @@ export default function PolicyAcceptModal({ policies, onAllAccepted }) {
   };
 
   return (
-    <div className="modal-overlay">
       <div className="modal-content">
+        <div className="section-container">
         <h2>Mandatory Policy Acknowledgement</h2>
         <p>You must review and accept all system and organizational policies to gain access.</p>
         
