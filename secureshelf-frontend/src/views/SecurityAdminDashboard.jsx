@@ -23,38 +23,47 @@ export default function SecurityAdminDashboard({
     <div className="dashboard-container">
       <h1>Security Administrator Workspace</h1>
 
-      {/* Reported Incidents Table (Exclusive View) */}
-      <section className="section-container">
-        <h2>Reported Security Incidents (Exclusive View)</h2>
-        <div className="table-responsive">
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Reporter</th>
-                <th>Description</th>
-                <th>Severity</th>
-                <th>Timestamp</th>
-              </tr>
-            </thead>
-            <tbody>
-              {incidents.length === 0 ? (
-                <tr><td colSpan="5">No security incidents reported.</td></tr>
-              ) : (
-                incidents.map((inc) => (
-                  <tr key={inc.id}>
-                    <td>{inc.id}</td>
-                    <td>{inc.reportedBy}</td>
-                    <td>{inc.description}</td>
-                    <td>{inc.severity}</td>
-                    <td>{inc.timestamp}</td>
+       <div style={{ marginTop: '32px' }}>
+          <h3>Reported Security Incidents (Exclusive View)</h3>
+          <div className="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>REPORTER</th>
+                  <th>TYPE</th>
+                  <th>DESCRIPTION</th>
+                  <th>SEVERITY</th>
+                  <th>TIMESTAMP</th>
+                </tr>
+              </thead>
+              <tbody>
+                {incidents.length === 0 ? (
+                  <tr>
+                    <td colSpan="6" style={{ textAlign: 'center', padding: '16px', color: '#64748b' }}>
+                      No security incidents reported.
+                    </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  incidents.map((inc) => (
+                    <tr key={inc.id}>
+                      <td>{inc.id}</td>
+                      <td>{inc.reportedBy}</td>
+                      <td>{inc.type}</td>
+                      <td>{inc.description}</td>
+                      <td>
+                        <span className="status-badge" style={{ backgroundColor: inc.severity === 'Critical' || inc.severity === 'High' ? '#fee2e2' : '#fef3c7', color: inc.severity === 'Critical' || inc.severity === 'High' ? '#b91c1c' : '#b45309' }}>
+                          {inc.severity}
+                        </span>
+                      </td>
+                      <td>{inc.timestamp}</td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </section>
 
       {/* Account Lockouts & Password Attempts Section */}
       <section className="section-container account-lockouts-container">

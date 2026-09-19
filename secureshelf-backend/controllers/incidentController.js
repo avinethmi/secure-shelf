@@ -1,23 +1,28 @@
 import { database } from '../models/mockDatabase.js';
 
 export const reportIncident = (req, res) => {
-  const { reportedBy, description, severity } = req.body;
+  const { reportedBy, type, description, severity } = req.body;
+  
   const newIncident = {
     id: Date.now(),
-    reportedBy,
-    description,
+    reportedBy: reportedBy || 'Cashier',
+    type: type || 'Unauthorized Access',
     severity: severity || 'Medium',
-    timestamp: new Date().toLocaleString()
+    description,
+    timestamp: new Date().toLocaleString() // Captures exact server submission time
   };
+
   database.incidents.push(newIncident);
   res.status(201).json(newIncident);
 };
 
 export const getIncidents = (req, res) => {
-  // Only Security Admin has view permission
   const userRole = req.headers['x-user-role'];
-  if (userRole !== 'Security Admin') {
-    return res.status(403).json({ message: 'Access denied. Security Admin only.' });
+  
+  // Allow Security Admin and Owner to view incidents
+  if (userRole !== 'Security Admin' && userRole !== 'Owner') {
+    return res.status(403).json({ message: 'Access denied.' });
   }
+  
   res.json(database.incidents);
 };
