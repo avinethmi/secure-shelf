@@ -1,80 +1,70 @@
 const express = require('express');
-const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const xss = require('xss-clean');
+const hpp = require('hpp');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const app = express();
-const JWT_SECRET = process.env.JWT_SECRET || 'secureshelf_super_secret_key_2026';
 
-/* --- SECURE CODING MIDDLEWARE --- */
-
-// 1. HTTP Security Headers
+// 1. HELMET HTTP HEADER PROTECTIONS
 app.use(helmet());
 
-// 2. CORS Configuration
-app.use(cors({
-  origin: 'http://localhost:3000', // Adjust to match your frontend dev server URL
-  credentials: true
-}));
-
-// 3. Body Parser with payload limit
-app.use(express.json({ limit: '10kb' }));
-
-// 4. Rate Limiting (Prevents Brute Force Attacks)
-const authLimiter = rateLimit({
+// 2. RATE-LIMITING AGAINST BRUTE FORCE (Login route specific)
+const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10, // Limit each IP to 10 requests per windowMs for auth routes
-  message: { error: 'Too many authentication attempts. Please try again in 15 minutes.' }
+  max: 5, // Limit each IP to 5 login requests per windowMs
+  message: { error: 'Too many login attempts, please try again after 15 minutes.' },
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
-app.use('/api/auth/', authLimiter);
+// 3. BODY PARSER & XSS / SQL INJECTION SANITIZATION
+app.use(express.json({ limit: '10kb' })); // Prevents large payload attacks
 
-/* --- MOCK USER DATABASE (Hashed Passwords) --- */
-// In production, fetch this from MongoDB / PostgreSQL
-const users = [
-  {
-    id: 'USR-001',
-    email: 'admin@secureshelf.com',
-    // Pre-hashed password for "AdminPass123!" using bcrypt (10 rounds)
-    passwordHash: '$2a$10$w4rU8T7J0QGk7v9z8Y5X1e8H1v2K3L4M5N6O7P8Q9R0S1T2U3V4W5',
-    role: 'Security Analyst'
-  }
-];
+// Sanitize user input against XSS scripts
+app.use(xss());
 
-/* --- AUTHENTICATION ENDPOINT --- */
-app.post('/api/auth/login', async (req, res) => {
+// Prevent HTTP Parameter Pollution
+app.use(hpp());
+
+// Helper input sanitizer function for string inputs (SQLi / XSS defense)
+const sanitizeInput = (str) => {
+  if (typeof str !== 'string') return str;
+  return str.replace(/['";\\]/g, '').trim(); // Strips common SQL injection characters
+};
+
+// 4. BCRYPT PASSWORD HASHING & JWT TOKEN AUTHENTICATION
+const JWT_SECRET = process.env.JWT_SECRET || 'secureshelf_super_secret_key';
+
+// Login Endpoint
+app.post('/api/auth/login', loginLimiter, async (req, res) => {
+  const email = sanitizeInput(req.body.email);
+  const password = req.body.password;
+
   try {
-    const { email, password } = req.body;
+    // Replace this query with your database lookup logic
+    const user = await getUserByEmail(email); 
 
-    // Input Validation
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required.' });
-    }
-
-    // User lookup
-    const user = users.find(u => u.email === email.toLowerCase().trim());
     if (!user) {
-      // Generic message to prevent account enumeration
-      return res.status(401).json({ error: 'Invalid credentials provided.' });
+      return res.status(401).json({ error: 'Invalid email or password' });
     }
 
-    // Password verification using Bcrypt
+    // Verify password with Bcrypt
     const isMatch = await bcrypt.compare(password, user.passwordHash);
     if (!isMatch) {
-      return res.status(401).json({ error: 'Invalid credentials provided.' });
+      return res.status(401).json({ error: 'Invalid email or password' });
     }
 
-    // Sign JWT Token
+    // Generate JWT Token including Role-Based Access Status
     const token = jwt.sign(
       { userId: user.id, email: user.email, role: user.role },
       JWT_SECRET,
       { expiresIn: '2h' }
     );
 
-    return res.status(200).json({
-      message: 'Authentication successful',
+    res.json({
       token,
       user: {
         id: user.id,
@@ -82,39 +72,37 @@ app.post('/api/auth/login', async (req, res) => {
         role: user.role
       }
     });
-
   } catch (err) {
-    return res.status(500).json({ error: 'Internal server error during authentication.' });
+    res.status(500).json({ error: 'Authentication failed server-side.' });
   }
 });
 
-/* --- SECURE JWT AUTHENTICATION MIDDLEWARE --- */
-const verifyToken = (req, res, next) => {
+// 5. ROLE-BASED ACCESS CONTROL (RBAC) MIDDLEWARE
+const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
-  if (!token) {
-    return res.status(401).json({ error: 'Access denied. No token provided.' });
-  }
+  if (!token) return res.status(401).json({ error: 'Access denied. Token missing.' });
 
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded;
+  jwt.verify(token, JWT_SECRET, (err, decodedUser) => {
+    if (err) return res.status(403).json({ error: 'Invalid or expired token.' });
+    req.user = decodedUser;
     next();
-  } catch (err) {
-    return res.status(403).json({ error: 'Invalid or expired token.' });
-  }
+  });
 };
 
-/* --- SECURE PROTECTED API ROUTES --- */
-app.get('/api/logs', verifyToken, (req, res) => {
-  res.status(200).json({
-    message: 'CCTV Logs retrieved successfully.',
-    requestedBy: req.user.email
-  });
-});
+const authorizeRoles = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!allowedRoles.includes(req.user.role)) {
+      return res.status(403).json({ 
+        error: `Role '${req.user.role}' is not authorized to access this resource.` 
+      });
+    }
+    next();
+  };
+};
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`SecureShelf Backend server running on port ${PORT}`);
+// Example Protected Route with Role-Based Access Status
+app.get('/api/owner/cctv', authenticateToken, authorizeRoles('Owner', 'Security Admin'), (req, res) => {
+  res.json({ message: 'Authorized access to CCTV logs.' });
 });

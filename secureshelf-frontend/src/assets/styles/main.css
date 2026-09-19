@@ -314,9 +314,11 @@ form.inline-form button:hover {
 
 /* Privacy notice styling */
 .login-card .privacy-notice {
+  display: block !important;
   font-size: 12px !important;
   color: #64748b !important;
   text-align: center !important;
-  margin-top: 18px !important;
-  line-height: 1.4 !important;
+  margin-top: 20px !important;
+  line-height: 1.5 !important;
+  width: 100% !important;
 }

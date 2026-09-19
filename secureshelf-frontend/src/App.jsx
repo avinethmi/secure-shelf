@@ -6,6 +6,7 @@ import SecurityQuizModal from './components/quiz/securityQuizmodal';
 import SecurityAdminDashboard from './views/SecurityAdminDashboard';
 import OwnerDashboard from './views/OwnerDashboard';
 import CashierDashboard from './views/CashierDashboard';
+
 import './assets/styles/main.css';
 
 export default function App() {
@@ -22,9 +23,19 @@ export default function App() {
   const [policyAccepted, setPolicyAccepted] = useState(false);
   const [quizPassed, setQuizPassed] = useState(false);
 
+  // Client-Side Input Sanitization Helper against XSS & SQLi payloads
+  const sanitizeInput = (str) => {
+    if (typeof str !== 'string') return '';
+    return str.replace(/[<>'";\\]/g, '').trim();
+  };
+
   const handleLogin = (e) => {
     e.preventDefault();
-    const result = loginUser(email, password);
+
+    // Sanitize user inputs prior to processing authentication
+    const cleanEmail = sanitizeInput(email);
+
+    const result = loginUser(cleanEmail, password);
 
     if (result.success) {
       setCurrentUser(result.user);
@@ -49,7 +60,12 @@ export default function App() {
   };
 
   const handlePublishPolicy = (policyObj) => {
-    const created = createPolicy(policyObj.title, policyObj.content, policyObj.publishedBy, policyObj.authorId);
+    const created = createPolicy(
+      sanitizeInput(policyObj.title),
+      sanitizeInput(policyObj.content),
+      policyObj.publishedBy,
+      policyObj.authorId
+    );
     setPolicies([...database.policies]);
   };
 
@@ -82,6 +98,19 @@ export default function App() {
 
             <button type="submit" className="login-btn">Log In</button>
           </form>
+
+          {/* Ethical Privacy Notice */}
+          <div style={{ marginTop: '20px', paddingTop: '15px', borderTop: '1px solid #e2e8f0' }}>
+            <p style={{
+              margin: 0,
+              textAlign: 'center',
+              fontSize: '12px',
+              color: '#475569',
+              lineHeight: '1.4'
+            }}>
+              🔒 <strong>Ethical Data Notice:</strong> Authentication logs, access events, and training activity are recorded strictly in compliance with institutional employee privacy and security guidelines.
+            </p>
+          </div>
         </div>
       ) : (
         <>
@@ -101,8 +130,22 @@ export default function App() {
           {/* Workflow Step 3: Main Workspace View */}
           {policyAccepted && quizPassed && (
             <div>
-              <header className="app-header">
-                <div>User: <strong>{currentUser.email}</strong> ({currentUser.role})</div>
+              <header className="app-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 20px', backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                <div>
+                  User: <strong>{currentUser.email}</strong>
+                  {/* Role-Based Access Status Badge */}
+                  <span style={{
+                    marginLeft: '12px',
+                    padding: '4px 10px',
+                    borderRadius: '12px',
+                    fontSize: '12px',
+                    fontWeight: 'bold',
+                    backgroundColor: currentUser.role === 'Security Admin' ? '#dc2626' : currentUser.role === 'Owner' ? '#2563eb' : '#16a34a',
+                    color: '#ffffff'
+                  }}>
+                    Role: {currentUser.role}
+                  </span>
+                </div>
                 <button onClick={handleLogout} className="logout-btn">Log Out</button>
               </header>
 
