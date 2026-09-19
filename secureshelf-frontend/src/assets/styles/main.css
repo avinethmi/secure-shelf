@@ -311,3 +311,12 @@ form.inline-form button {
 form.inline-form button:hover {
   background-color: #1d4ed8 !important;
 }
+
+/* Privacy notice styling */
+.login-card .privacy-notice {
+  font-size: 12px !important;
+  color: #64748b !important;
+  text-align: center !important;
+  margin-top: 18px !important;
+  line-height: 1.4 !important;
+}

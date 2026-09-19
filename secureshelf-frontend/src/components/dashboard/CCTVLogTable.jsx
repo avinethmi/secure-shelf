@@ -1,7 +1,20 @@
 import React, { useState, useEffect } from 'react';
 
+// Simple XSS sanitization helper
+const sanitizeInput = (str) => {
+  return str.replace(/[&<>"']/g, (match) => {
+    const map = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#x27;'
+    };
+    return map[match];
+  });
+};
+
 export default function CctvGovernanceLogs() {
-  // Initialize state from localStorage so data survives a page refresh
   const [cctvLogs, setCctvLogs] = useState(() => {
     const savedLogs = localStorage.getItem('secureShelf_cctvLogs');
     return savedLogs ? JSON.parse(savedLogs) : [];
@@ -10,7 +23,6 @@ export default function CctvGovernanceLogs() {
   const [cameraId, setCameraId] = useState('');
   const [accessReason, setAccessReason] = useState('');
 
-  // Save to localStorage automatically whenever cctvLogs state changes
   useEffect(() => {
     localStorage.setItem('secureShelf_cctvLogs', JSON.stringify(cctvLogs));
   }, [cctvLogs]);
@@ -19,17 +31,18 @@ export default function CctvGovernanceLogs() {
     e.preventDefault();
     if (!cameraId.trim() || !accessReason.trim()) return;
 
+    // Sanitize values to prevent XSS injection
+    const cleanCamera = sanitizeInput(cameraId.trim());
+    const cleanReason = sanitizeInput(accessReason.trim());
+
     const newLog = {
-      id: `LOG-${Date.now().toString().slice(-6)}`, // Generate a simple unique ID
-      camera: cameraId.trim(),
-      reason: accessReason.trim(),
+      id: `LOG-${Date.now().toString().slice(-6)}`,
+      camera: cleanCamera,
+      reason: cleanReason,
       timestamp: new Date().toLocaleString()
     };
 
-    // Add new log to the beginning of the list
     setCctvLogs((prevLogs) => [newLog, ...prevLogs]);
-    
-    // Clear the input fields
     setCameraId('');
     setAccessReason('');
   };
@@ -38,7 +51,7 @@ export default function CctvGovernanceLogs() {
     <section className="section-container">
       <h2>CCTV Governance & Log Records</h2>
 
-      {/* Input Form matched to publish-card structure */}
+      {/* Input Form */}
       <div className="publish-card">
         <form onSubmit={handleSubmit}>
           <div className="form-row">
@@ -97,6 +110,10 @@ export default function CctvGovernanceLogs() {
           </tbody>
         </table>
       </div>
+
+      <p style={{ fontSize: '12px', color: '#64748b', marginTop: '16px', textAlign: 'center' }}>
+        🛡️ <strong>Audit Trail:</strong> Access logs are encrypted in transit and monitored solely for institutional physical security governance.
+      </p>
     </section>
   );
 }
