@@ -50,48 +50,50 @@ export default function IncidentTable({ currentUser }) {
       <h2>Security Incident Reporting</h2>
       {message && <p className="success-text" style={{ color: '#15803d', fontWeight: 600 }}>{message}</p>}
 
-      {/* Render Updated Dropdown Form */}
+      {/* Form Card */}
       <IncidentReportForm onAddIncident={handleAddIncident} />
 
-      {/* Incident Table with TYPE included */}
-      <h3>Reported Security Incidents (Exclusive View)</h3>
-      <div className="table-responsive">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>REPORTER</th>
-              <th>TYPE</th>
-              <th>DESCRIPTION</th>
-              <th>SEVERITY</th>
-              <th>TIMESTAMP</th>
-            </tr>
-          </thead>
-          <tbody>
-            {incidents.length === 0 ? (
+      {/* Reported Security Incidents Table inside Card Box */}
+      <div className="publish-card" style={{ marginTop: '24px', marginBottom: '24px' }}>
+        <h3>Reported Security Incidents (Exclusive View)</h3>
+        <div className="table-responsive">
+          <table>
+            <thead>
               <tr>
-                <td colSpan="6" style={{ textAlign: 'center', padding: '16px', color: '#64748b' }}>
-                  No security incidents reported.
-                </td>
+                <th>ID</th>
+                <th>REPORTER</th>
+                <th>TYPE</th>
+                <th>DESCRIPTION</th>
+                <th>SEVERITY</th>
+                <th>TIMESTAMP</th>
               </tr>
-            ) : (
-              incidents.map((inc) => (
-                <tr key={inc.id}>
-                  <td>INC-{inc.id}</td>
-                  <td>{inc.reportedBy || 'Cashier'}</td>
-                  <td>{inc.type || 'Unauthorized Access'}</td>
-                  <td>{inc.description}</td>
-                  <td>
-                    <span className={`status-badge severity-${(inc.severity || 'Medium').toLowerCase()}`}>
-                      {inc.severity || 'Medium'}
-                    </span>
+            </thead>
+            <tbody>
+              {incidents.length === 0 ? (
+                <tr>
+                  <td colSpan="6" style={{ textAlign: 'center', padding: '16px', color: '#64748b' }}>
+                    No security incidents reported.
                   </td>
-                  <td>{inc.timestamp}</td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                incidents.map((inc) => (
+                  <tr key={inc.id}>
+                    <td>INC-{inc.id}</td>
+                    <td>{inc.reportedBy || 'Cashier'}</td>
+                    <td>{inc.type || 'Unauthorized Access'}</td>
+                    <td>{inc.description}</td>
+                    <td>
+                      <span className={`status-badge severity-${(inc.severity || 'Medium').toLowerCase()}`}>
+                        {inc.severity || 'Medium'}
+                      </span>
+                    </td>
+                    <td>{inc.timestamp}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
   );
