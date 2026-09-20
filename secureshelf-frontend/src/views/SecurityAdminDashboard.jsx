@@ -79,12 +79,11 @@ export default function SecurityAdminDashboard({
         <h2>Account Lockouts &amp; Password Attempts (Database Status)</h2>
 
         <form onSubmit={handleManualUnlockSubmit} className="manual-unlock-form" style={{ marginBottom: '20px' }}>
-          <div className="form-row">
+          <div className="floating-input-group">
             <label htmlFor="unlock-username">Username to Unlock:</label>
             <input
               id="unlock-username"
               type="text"
-              placeholder="Enter username..."
               value={usernameToUnlock}
               onChange={(e) => setUsernameToUnlock(e.target.value)}
               required

@@ -404,6 +404,41 @@ form.inline-form button:hover {
   border-color: #2563eb !important;
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15) !important;
 }
+.floating-input-group {
+  position: relative;
+  margin-top: 15px;
+  width: 100%;
+  max-width: 500px; /* Adjust width as needed */
+}
+
+.floating-input-group label {
+  position: absolute;
+  top: -10px;               /* Position label over the top border */
+  left: 14px;               /* Indent from the left corner */
+  background-color: #ffffff;/* CRITICAL: Masks the blue border line behind text */
+  padding: 0 6px;           /* Gives padding around text so border doesn't touch letters */
+  font-size: 13px;
+  font-weight: 600;
+  color: #0056b3;           /* Matching blue text color */
+  z-index: 1;               /* Ensures label stays on top of input border */
+}
+
+.floating-input-group input {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 14px;
+  border: 1px solid #b0c4de; /* Border color */
+  border-radius: 8px;       /* Soft rounded corners */
+  outline: none;
+  background: transparent;
+  box-sizing: border-box;
+}
+
+/* Optional: Highlight border when active */
+.floating-input-group input:focus {
+  border-color: #0056b3;
+}
+
 /* Cyber-themed background on page backdrop only */
 body {
   margin: 0;
