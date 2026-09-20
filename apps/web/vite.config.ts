@@ -1,0 +1,23 @@
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
+import { fileURLToPath, URL } from 'node:url';
+
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+  resolve: {
+    alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
+  },
+  server: {
+    port: 5173,
+    strictPort: true,
+    proxy: {
+      // Development only: the API runs on 4000. In the demo build the API serves dist/ itself.
+      '/api': { target: 'http://localhost:4000', changeOrigin: false },
+    },
+  },
+  build: {
+    sourcemap: false,
+    target: 'es2022',
+  },
+});

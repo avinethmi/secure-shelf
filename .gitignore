@@ -1,12 +1,32 @@
-# Node dependencies
+# dependencies
 node_modules/
-**/node_modules/
 
-# Build and environment files
+# environment and secrets (NFR-06: credentials stay out of source control)
 .env
-build/
-dist/
+.env.*
+!.env.example
 
-node_modules/
-secureshelf-frontend/node_modules/
-secureshelf-backend/node_modules/
+# build output
+dist/
+apps/web/dist/
+apps/api/dist/
+
+# evidence files uploaded through the app (proposal §4: outside the web root, never committed)
+apps/api/storage/
+storage/
+
+# database backups
+backups/
+
+# test artefacts
+coverage/
+playwright-report/
+test-results/
+apps/web/e2e/screenshots/
+
+# local logs and editor files
+*.log
+.dev-server.log
+.DS_Store
+.vscode/
+.idea/

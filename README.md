@@ -1,46 +1,47 @@
-# 🛡️ SecureShelf Portal
+# SecureShelf
 
-**SecureShelf** is a role-aware Information Security & Governance System designed for retail operations. It provides role-based access control (RBAC), security policy management, CCTV governance tracking, and an incident escalation pipeline to bridge operational staff and security administration.
+Security policy and awareness system for Marvels (retail and wholesale). IE3072 Information Security Policy and Management, group assignment, SLIIT 2026.
 
----
+SecureShelf gives the owner and staff one place to publish security policies, record acknowledgements, complete role-based training, keep an asset and control register, document CCTV governance, report incidents, and keep an append-only audit trail. It is a management aid, not a replacement for the billing or CCTV systems.
 
-## ✨ Features
+## Stack
 
-- **🔐 Role-Based Access Control (RBAC):**
-  - **Cashier Workspace:** Streamlined view to report security incidents and complete mandatory compliance checks.
-  - **Owner Workspace:** CCTV log management, incident reporting, and security policy overview.
-  - **Security Admin Dashboard:** Centralized security oversight, account unlock controls, incident queue management, and policy distribution.
+| Layer | Choice |
+|---|---|
+| Web | React 19, Vite, TypeScript, Tailwind CSS v4, TanStack Query, react-hook-form + Zod |
+| API | Node 22+, Express 5, TypeScript, Zod validation, Drizzle ORM |
+| Data | PostgreSQL 16 (Docker), two roles: `secureshelf_migrator` (schema owner) and `secureshelf_app` (runtime, no UPDATE/DELETE on audit) |
+| Security | Helmet, CORS allowlist, rate limiting, Argon2id, TOTP second factor, AES-256-GCM field encryption, httpOnly SameSite=Strict cookies, hash-chained audit log |
 
-- **🚨 Security Incident Escalation Pipeline:**
-  - Categorized reporting (**Unauthorized Access**, **Suspicious Activity**, **Policy Violation**, **Hardware / Register Issue**).
-  - Severity classification (**Low**, **Medium**, **High**, **Critical**).
-  - Real-time/persistent incident log table per workspace.
+## Run it
 
-- **📹 CCTV Governance & Log Audit:**
-  - Audit logging for camera access requests with reason tracking and timestamping.
-  - Deletion/retention capabilities for authorized roles.
+```bash
+cp .env.example .env         # then replace the three secrets (see comments in the file)
+npm install
+npm run db:up                # PostgreSQL in Docker
+npm run db:migrate
+npm run db:seed              # fictional demo data
+npm run dev                  # web on http://localhost:5173, API on http://localhost:4000
+```
 
-- **📜 Policy & Compliance Management:**
-  - Publish, distribute, and enforce security policies across all active workspace accounts.
-  - Interactive policy acceptance modal and verification quizzes for staff onboarding/sessions.
+Demo build (one origin, served by the API):
 
----
+```bash
+npm run build
+NODE_ENV=production npm start   # http://localhost:4000
+```
 
-## 🏗️ Project Architecture
+Checks: `npm run smoke` (native dependencies and database), `npm test` (API integration tests), `npm run typecheck`.
 
-```text
-secureshelf/
-├── secureshelf-frontend/        # React (Vite) Frontend
-│   ├── src/
-│   │   ├── assets/styles/      # Global & Component CSS
-│   │   ├── components/         # Common UI, Modals, Forms
-│   │   ├── views/              # Dashboards (Admin, Owner, Cashier)
-│   │   ├── mockData/           # Fallback mock data structure
-│   │   └── App.jsx             # Authentication & Main Workflow Controller
-│   └── package.json
-│
-└── secureshelf-backend/         # Node.js / Express REST API
-    ├── config/                 # Database configuration (db.js)
-    ├── routes/                 # Express API Routes (CCTV, Incidents, Policies)
-    ├── server.js               # Entry point
-    └── package.json
+## Layout
+
+```
+apps/api          Express API (src/modules/* per feature, src/db for schema and migrations)
+apps/web          React SPA
+packages/shared   enums and Zod schemas used by both
+docker/           PostgreSQL init SQL
+docs/             architecture, security, backup/restore, demo script, AUP outline
+llm-context/      assignment spec, proposal and lecture digest as text
+```
+
+Proposal: `../Project-Proposal-IE3072.docx` (text copy in `llm-context/proposal.md`).
