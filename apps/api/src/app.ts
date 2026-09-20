@@ -7,6 +7,10 @@ import fs from 'node:fs';
 import { env, isProduction } from './config/env.js';
 import { errorHandler, notFound } from './middleware/errorHandler.js';
 import { originCheck } from './middleware/originCheck.js';
+import { apiLimiter } from './middleware/rateLimit.js';
+import { authRouter } from './modules/auth/routes.js';
+import { usersRouter } from './modules/users/routes.js';
+import { auditRouter } from './modules/audit/routes.js';
 
 // Proposal §4, Figure 1: the API is the trust boundary. Everything security-relevant
 // (headers, origin policy, body limits) is configured here, once, before any route.
@@ -61,7 +65,11 @@ export function createApp() {
     res.json({ status: 'ok', service: 'secureshelf-api', time: new Date().toISOString() });
   });
 
-  // Feature routers are mounted here as phases land (auth, users, policies, ...).
+  app.use('/api', apiLimiter);
+  app.use('/api/auth', authRouter);
+  app.use('/api/users', usersRouter);
+  app.use('/api/audit', auditRouter);
+  // Phase 2+: policies, training, compliance, cctv, incidents, dashboard.
 
   // 5. In the demo build the compiled SPA is served from the API on one origin.
   const webDist = path.resolve(process.cwd(), '../web/dist');
