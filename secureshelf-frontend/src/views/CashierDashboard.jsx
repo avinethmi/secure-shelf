@@ -42,37 +42,41 @@ export default function CashierDashboard({ onReportIncident }) {
         <div className="publish-card">
           <h2>Report Security Incident</h2>
           <form onSubmit={handleIncidentSubmit}>
-            <div className="form-row">
+            <div className="form-field-group">
               <label htmlFor="cashier-incident-type">Incident Type</label>
-              <select
-                id="cashier-incident-type"
-                value={type}
-                onChange={(e) => setType(e.target.value)}
-                required
-              >
-                <option value="Unauthorized Access">Unauthorized Access</option>
-                <option value="Suspicious Activity">Suspicious Activity</option>
-                <option value="Policy Violation">Policy Violation</option>
-                <option value="Hardware / Register Issue">Hardware / Register Issue</option>
-              </select>
+              <div className="select-wrapper">
+                <select
+                  id="cashier-incident-type"
+                  value={type}
+                  onChange={(e) => setType(e.target.value)}
+                  required
+                >
+                  <option value="Unauthorized Access">Unauthorized Access</option>
+                  <option value="Suspicious Activity">Suspicious Activity</option>
+                  <option value="Policy Violation">Policy Violation</option>
+                  <option value="Hardware / Register Issue">Hardware / Register Issue</option>
+                </select>
+              </div>
             </div>
 
-            <div className="form-row">
+            <div className="form-field-group">
               <label htmlFor="cashier-incident-severity">Severity Level</label>
-              <select
-                id="cashier-incident-severity"
-                value={severity}
-                onChange={(e) => setSeverity(e.target.value)}
-                required
-              >
-                <option value="Low">Low</option>
-                <option value="Medium">Medium</option>
-                <option value="High">High</option>
-                <option value="Critical">Critical</option>
-              </select>
+              <div className="select-wrapper">
+                <select
+                  id="cashier-incident-severity"
+                  value={severity}
+                  onChange={(e) => setSeverity(e.target.value)}
+                  required
+                >
+                  <option value="Low">Low</option>
+                  <option value="Medium">Medium</option>
+                  <option value="High">High</option>
+                  <option value="Critical">Critical</option>
+                </select>
+              </div>
             </div>
 
-            <div className="form-row align-top">
+            <div className="form-field-group">
               <label htmlFor="cashier-incident-desc">Description</label>
               <textarea
                 id="cashier-incident-desc"

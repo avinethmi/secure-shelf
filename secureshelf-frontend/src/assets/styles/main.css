@@ -340,6 +340,70 @@ form.inline-form button:hover {
   margin-bottom: 16px;
   color: #0f172a;
 }
+
+/* Container styling for stacked field groups */
+.form-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.form-field-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  text-align: left;
+}
+
+/* Wrapper to position the custom chevron arrow */
+.select-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* Polished Full-Width Select Input */
+.select-wrapper select,
+.publish-card select {
+  width: 100% !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  background-color: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 6px !important;
+  padding: 10px 36px 10px 12px !important;
+  font-size: 14px !important;
+  font-family: inherit !important;
+  color: #111827 !important;
+  outline: none !important;
+  cursor: pointer !important;
+  box-sizing: border-box !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+/* Custom Minimalist Dropdown Arrow Icon */
+.select-wrapper::after {
+  content: "";
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid #6b7280;
+  pointer-events: none;
+}
+
+/* Active Focus State */
+.select-wrapper select:focus,
+.publish-card select:focus {
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15) !important;
+}
 /* Cyber-themed background on page backdrop only */
 body {
   margin: 0;

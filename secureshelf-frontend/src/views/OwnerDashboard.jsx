@@ -82,11 +82,10 @@ export default function OwnerDashboard({
 
       {/* CCTV Data Management Section */}
       <section className="section-container">
-        <h2>CCTV Governance & Log Records</h2>
-
         <div className="publish-card">
+          <h2>CCTV Governance &amp; Log Records</h2>
           <form onSubmit={handleCCTVSubmit}>
-            <div className="form-row">
+            <div className="form-field-group">
               <label htmlFor="cctv-camera">Camera / Location</label>
               <input
                 id="cctv-camera"
@@ -97,7 +96,7 @@ export default function OwnerDashboard({
                 required
               />
             </div>
-            <div className="form-row">
+            <div className="form-field-group">
               <label htmlFor="cctv-reason">Access Reason</label>
               <input
                 id="cctv-reason"
@@ -114,86 +113,91 @@ export default function OwnerDashboard({
           </form>
         </div>
 
-        <h3>Logged CCTV Access Data</h3>
-        <div className="table-responsive">
-          <table>
-            <thead>
-              <tr>
-                <th>Log ID</th>
-                <th>Camera</th>
-                <th>Reason</th>
-                <th>Timestamp</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {localCctvLogs.length === 0 ? (
+        <div className="card-box" style={{ marginTop: '24px' }}>
+          <h3>Logged CCTV Access Data</h3>
+          <div className="table-responsive">
+            <table>
+              <thead>
                 <tr>
-                  <td colSpan="5" style={{ textAlign: 'center', padding: '16px' }}>
-                    No CCTV access records logged.
-                  </td>
+                  <th>Log ID</th>
+                  <th>Camera</th>
+                  <th>Reason</th>
+                  <th>Timestamp</th>
+                  <th>Action</th>
                 </tr>
-              ) : (
-                localCctvLogs.map((log) => (
-                  <tr key={log.id}>
-                    <td>{log.id}</td>
-                    <td>{log.camera}</td>
-                    <td>{log.reason}</td>
-                    <td>{log.date}</td>
-                    <td>
-                      <button
-                        type="button"
-                        className="danger-btn"
-                        onClick={() => handleDeleteCCTVLog(log.id)}
-                      >
-                        Delete
-                      </button>
+              </thead>
+              <tbody>
+                {localCctvLogs.length === 0 ? (
+                  <tr>
+                    <td colSpan="5" style={{ textAlign: 'center', padding: '16px' }}>
+                      No CCTV access records logged.
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  localCctvLogs.map((log) => (
+                    <tr key={log.id}>
+                      <td>{log.id}</td>
+                      <td>{log.camera}</td>
+                      <td>{log.reason}</td>
+                      <td>{log.date}</td>
+                      <td>
+                        <button
+                          type="button"
+                          className="danger-btn"
+                          onClick={() => handleDeleteCCTVLog(log.id)}
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
 
       {/* Incident Reporting Section */}
       <section className="section-container">
-        <h2>Report Security Incident</h2>
-
         <div className="publish-card">
+          <h2>Report Security Incident</h2>
           <form onSubmit={handleIncidentSubmit}>
-            <div className="form-row">
+            <div className="form-field-group">
               <label htmlFor="owner-incident-type">Incident Type</label>
-              <select
-                id="owner-incident-type"
-                value={type}
-                onChange={(e) => setType(e.target.value)}
-                required
-              >
-                <option value="Unauthorized Access">Unauthorized Access</option>
-                <option value="Suspicious Activity">Suspicious Activity</option>
-                <option value="Policy Violation">Policy Violation</option>
-                <option value="Hardware / Register Issue">Hardware / Register Issue</option>
-              </select>
+              <div className="select-wrapper">
+                <select
+                  id="owner-incident-type"
+                  value={type}
+                  onChange={(e) => setType(e.target.value)}
+                  required
+                >
+                  <option value="Unauthorized Access">Unauthorized Access</option>
+                  <option value="Suspicious Activity">Suspicious Activity</option>
+                  <option value="Policy Violation">Policy Violation</option>
+                  <option value="Hardware / Register Issue">Hardware / Register Issue</option>
+                </select>
+              </div>
             </div>
 
-            <div className="form-row">
+            <div className="form-field-group">
               <label htmlFor="owner-incident-severity">Severity Level</label>
-              <select
-                id="owner-incident-severity"
-                value={severity}
-                onChange={(e) => setSeverity(e.target.value)}
-                required
-              >
-                <option value="Low">Low</option>
-                <option value="Medium">Medium</option>
-                <option value="High">High</option>
-                <option value="Critical">Critical</option>
-              </select>
+              <div className="select-wrapper">
+                <select
+                  id="owner-incident-severity"
+                  value={severity}
+                  onChange={(e) => setSeverity(e.target.value)}
+                  required
+                >
+                  <option value="Low">Low</option>
+                  <option value="Medium">Medium</option>
+                  <option value="High">High</option>
+                  <option value="Critical">Critical</option>
+                </select>
+              </div>
             </div>
 
-            <div className="form-row align-top">
+            <div className="form-field-group">
               <label htmlFor="owner-incident-desc">Description</label>
               <textarea
                 id="owner-incident-desc"
@@ -209,7 +213,6 @@ export default function OwnerDashboard({
             </button>
           </form>
         </div>
-
       </section>
 
       {/* Policy Management Section */}
