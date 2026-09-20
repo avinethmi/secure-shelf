@@ -2,7 +2,7 @@ import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import type { Permission } from '@secureshelf/shared';
 import { useAuth } from '@/features/auth/useAuth';
 
-function Splash() {
+export function Splash() {
   return (
     <div className="grid min-h-screen place-items-center bg-bg" role="status" aria-live="polite">
       <span className="size-6 animate-spin rounded-full border-2 border-accent border-t-transparent" />

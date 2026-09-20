@@ -32,6 +32,17 @@ export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
     res.status(403).json({ error: { code: 'cors', message: err.message } });
     return;
   }
+  // Database-enforced rules (triggers and unique constraints, migration 0001) are the last
+  // line of defence; when one fires the client gets a conflict, not a stack trace.
+  const pgCode = err && typeof err === 'object' && 'code' in err ? String((err as { code: unknown }).code) : '';
+  if (pgCode === '23514' || pgCode === 'P0001') {
+    res.status(409).json({ error: { code: 'conflict', message: 'The database rejected this change because the record is locked' } });
+    return;
+  }
+  if (pgCode === '23505') {
+    res.status(409).json({ error: { code: 'conflict', message: 'A record with the same value already exists' } });
+    return;
+  }
 
   const ref = Math.random().toString(36).slice(2, 10);
   console.error(`[${ref}] unhandled error:`, err);

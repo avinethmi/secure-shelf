@@ -1,14 +1,7 @@
 import { z } from 'zod';
 import { ROLES, USER_STATUSES } from '../enums';
 import { passwordSchema } from './auth';
-
-const optionalText = (max: number) =>
-  z
-    .string()
-    .trim()
-    .max(max)
-    .optional()
-    .transform((v) => (v === '' ? undefined : v));
+import { optionalText } from './common';
 
 export const createUserSchema = z.object({
   email: z.string().trim().toLowerCase().email().max(254),
@@ -38,5 +31,3 @@ export const setUserStatusSchema = z.object({
   reason: optionalText(300),
 });
 export type SetUserStatusInput = z.infer<typeof setUserStatusSchema>;
-
-export const idParamSchema = z.object({ id: z.coerce.number().int().positive() });

@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
-import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { IconLogout, IconMenu2, IconShieldLock, IconX } from '@tabler/icons-react';
+import { IconLogout, IconMenu2, IconShieldLock, IconX, IconFileText } from '@tabler/icons-react';
 import { ROLE_LABELS } from '@secureshelf/shared';
 import { cn } from '@/lib/cn';
 import { useAuth } from '@/features/auth/useAuth';
 import { NAV, NAV_GROUP_LABELS, type NavItem } from '@/app/nav';
+import { usePendingAcknowledgements } from '@/features/policies/api';
+import { clearGate } from '@/features/policies/AcknowledgementGate';
 
 // Docker Desktop structure: fixed left sidebar (icon + label), top bar with page title and
 // the signed-in user, content area. Below md the sidebar becomes a drawer (FR-20, 375px).
@@ -15,14 +17,18 @@ export function AppShell() {
   const location = useLocation();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const reduce = useReducedMotion();
+  const { pending } = usePendingAcknowledgements();
 
   useEffect(() => setDrawerOpen(false), [location.pathname]);
 
   const items = NAV.filter((n) => can(...n.permissions));
   const groups = (['work', 'govern', 'admin'] as const).map((g) => ({ key: g, label: NAV_GROUP_LABELS[g], items: items.filter((i) => i.group === g) })).filter((g) => g.items.length);
   const current = items.find((n) => (n.to === '/app' ? location.pathname === '/app' : location.pathname.startsWith(n.to)));
+  const title = location.pathname === '/app/acknowledge' ? 'Policies to acknowledge' : (current?.label ?? 'SecureShelf');
+  const showAckBanner = pending.length > 0 && location.pathname !== '/app/acknowledge' && !location.pathname.startsWith('/app/policies/read/');
 
   const onLogout = async () => {
+    clearGate(user?.id);
     await logout();
     navigate('/login', { replace: true });
   };
@@ -125,8 +131,19 @@ export function AppShell() {
           <button type="button" onClick={() => setDrawerOpen(true)} aria-label="Open menu" className="grid size-9 place-items-center rounded-lg text-fg-muted hover:bg-white/5 md:hidden">
             <IconMenu2 aria-hidden className="size-5" />
           </button>
-          <h1 className="truncate text-base font-semibold">{current?.label ?? 'SecureShelf'}</h1>
+          <h1 className="truncate text-base font-semibold">{title}</h1>
         </header>
+        {showAckBanner && (
+          <div role="status" className="flex items-center gap-3 border-b border-warning/30 bg-warning/10 px-4 py-2 text-sm text-amber-100 md:px-6">
+            <IconFileText aria-hidden className="size-4 shrink-0" />
+            <span className="min-w-0 flex-1 truncate">
+              {pending.length} {pending.length === 1 ? 'policy needs' : 'policies need'} your acknowledgement.
+            </span>
+            <Link to="/app/acknowledge" className="shrink-0 font-medium underline-offset-2 hover:underline">
+              Read now
+            </Link>
+          </div>
+        )}
         <main className="flex-1 px-4 py-5 md:px-6 md:py-6">
           <Outlet />
         </main>
