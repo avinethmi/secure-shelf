@@ -201,7 +201,6 @@ export default function OwnerDashboard({
               <label htmlFor="owner-incident-desc">Description</label>
               <textarea
                 id="owner-incident-desc"
-                placeholder="Describe the security incident..."
                 value={incidentDesc}
                 onChange={(e) => setIncidentDesc(e.target.value)}
                 required

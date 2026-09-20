@@ -80,8 +80,6 @@ export default function CashierDashboard({ onReportIncident }) {
               <label htmlFor="cashier-incident-desc">Description</label>
               <textarea
                 id="cashier-incident-desc"
-                placeholder="Enter incident details (e.g., suspicious activity, physical security breach)..."
-                value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 required
               />
