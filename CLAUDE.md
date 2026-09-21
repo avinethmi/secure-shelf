@@ -1,6 +1,6 @@
 # SecureShelf (IE3072 group project)
 
-Read first: `llm-context/proposal.md` (the contract the demo is marked against), `llm-context/spec.md` (marking scheme), `llm-context/module-notes.md` (what the module teaches). Do not re-read the docx/pptx originals.
+Read first: `llm-context/plan.md` (phase plan, progress, assumptions A1 to A7), `llm-context/proposal.md` (the contract the demo is marked against), `llm-context/spec.md` (marking scheme), `llm-context/module-notes.md` (what the module teaches). Do not re-read the docx/pptx originals.
 
 ## Non-negotiables
 
@@ -25,4 +25,11 @@ Read first: `llm-context/proposal.md` (the contract the demo is marked against),
 
 ## Git
 
-Work on `rebuild/v2`. Commit after each phase of the plan with a Conventional Commits subject. Do not push unless the user says so.
+Work on `main`. Commit after each phase of the plan with a Conventional Commits subject. Do not push unless the user says so.
+
+## Team commands
+
+Both need a working setup first: `.env` copied from `.env.example` with the three secrets filled in, Docker running, `npm install`, `npm run db:migrate`, `npm run db:seed` (see README "Run it").
+
+- **show plan**: read `llm-context/plan.md` and print a table of phases 0 to 6 with status (done, next, pending), the commit sha and date taken from the ticked lines, then list the bullets of the next unchecked phase. Read only, change nothing.
+- **start working**: run `npm run smoke` and `npm test` first and record the baseline. Implement the first unchecked phase in `llm-context/plan.md` following its bullets and every rule in this file. `npm run typecheck` and `npm test` must pass before committing. Commit with a Conventional Commits subject, and in the same commit tick the phase in `plan.md` with the date, sha and test count. Then stop and report what changed. Never skip ahead to a later phase, never push.
